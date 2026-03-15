@@ -1,6 +1,42 @@
 import React, { useEffect, useRef, useState } from 'react';
+import QRGenerator from './QRGenerator';
 
-export default function QRScanner() {
+export default function App() {
+  const [activeTab, setActiveTab] = useState('scanner');
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <div className="max-w-2xl mx-auto">
+        <div className="flex bg-white rounded-lg shadow-sm mb-6 p-1">
+          <button
+            onClick={() => setActiveTab('scanner')}
+            className={`flex-1 py-2 px-4 rounded-md font-medium transition ${
+              activeTab === 'scanner'
+                ? 'bg-indigo-100 text-indigo-700'
+                : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+            }`}
+          >
+            📱 Escáner
+          </button>
+          <button
+            onClick={() => setActiveTab('generator')}
+            className={`flex-1 py-2 px-4 rounded-md font-medium transition ${
+              activeTab === 'generator'
+                ? 'bg-indigo-100 text-indigo-700'
+                : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+            }`}
+          >
+            ✨ Generador
+          </button>
+        </div>
+
+        {activeTab === 'scanner' ? <QRScanner /> : <QRGenerator />}
+      </div>
+    </div>
+  );
+}
+
+function QRScanner() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [scannedData, setScannedData] = useState([]);
@@ -38,8 +74,9 @@ export default function QRScanner() {
     startCamera();
 
     return () => {
-      if (videoRef.current?.srcObject) {
-        videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+      const videoElement = videoRef.current;
+      if (videoElement?.srcObject) {
+        videoElement.srcObject.getTracks().forEach(track => track.stop());
       }
     };
   }, [isScanning]);
@@ -115,8 +152,8 @@ export default function QRScanner() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="max-w-2xl mx-auto">
+    <div className="w-full">
+      <div>
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
           <div className="flex items-center gap-3 mb-6">
             <h1 className="text-3xl font-bold text-gray-800">📱 Lector QR</h1>
@@ -182,7 +219,7 @@ export default function QRScanner() {
         </div>
 
         {scannedData.length > 0 && (
-          <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="bg-white rounded-lg shadow-lg p-6 mt-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-gray-800">
                 Códigos escaneados ({scannedData.length})
